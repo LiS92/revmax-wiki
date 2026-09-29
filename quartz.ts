@@ -170,6 +170,29 @@ const pagefindGlue = `(() => {
       open()
     }
   }, true)
+
+  // Меню на телефоне должно закрываться после перехода. Плагин explorer закрывает его, только если
+  // checkVisibility() кнопки меню вернёт true, а в WebKit (Safari и все браузеры iOS) сразу после
+  // перехода кнопка ещё числится скрытой — меню оставалось открытым поверх статьи. Закрываем сами:
+  // при нажатии на ссылку в меню и после каждого перехода. 800px — граница мобильных стилей меню.
+  const phone = () => window.matchMedia("(max-width: 800px)").matches
+  const closeMenu = () => {
+    if (!phone()) return
+    for (const ex of document.querySelectorAll(".explorer")) {
+      if (ex.classList.contains("collapsed")) continue
+      ex.classList.add("collapsed")
+      ex.setAttribute("aria-expanded", "false")
+    }
+    document.documentElement.classList.remove("mobile-no-scroll")
+  }
+  document.addEventListener("click", (e) => {
+    const t = e.target
+    if (t instanceof Element && t.closest(".explorer .explorer-content a[href]")) closeMenu()
+  })
+  document.addEventListener("nav", () => {
+    closeMenu()
+    setTimeout(closeMenu, 50)
+  })
 })()`
 // Пробел между ячейками таблиц прямо в HTML: Quartz выводит <td> вплотную, и Pagefind склеивает
 // соседние ячейки в выдержках («НомерДетальОригинальное название»). На вид таблиц пробел не влияет.
