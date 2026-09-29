@@ -41,29 +41,7 @@ title: Полезная информация
 
 Каталог Sportster RH 2021 в PDF — в разделе [[Каталог запчастей Sportster 2021|Документация]].
 
-## Запчасти и расходники
-
-| Магазин | Что там искать |
-|---|---|
-| [partsimport.ru](https://partsimport.ru), [oem.partsimport.ru](https://oem.partsimport.ru) | Оригинальные запчасти под заказ по каталожному номеру, доставка около 60 дней |
-| [harley-riders.ru](https://www.harley-riders.ru) | Оригинальные запчасти Harley-Davidson в наличии: натяжители цепи привода распредвалов (новой версии), датчики давления масла и другое |
-| [cartelworkshop.ru](https://cartelworkshop.ru) | Гидравлические натяжители цепи привода распредвалов |
-| [kolodki.shop](https://kolodki.shop) | Тормозные колодки Puller для Sportster S (SN630, SN760, SB630) |
-| [insaneracing.ru](https://insaneracing.ru), [amk-center.ru](https://amk-center.ru) | Аккумулятор BGZ16HL — замена штатному |
-| [oilbardahl.ru](https://oilbardahl.ru) | Моторное масло Bardahl |
-| [hiflofiltro.com](https://www.hiflofiltro.com/catalogue/filter/HF176B) | Каталог масляных фильтров HIFLO (HF176) |
-| Ozon, Wildberries, AliExpress, Avito | Расходники, аксессуары, подержанные детали. Детали тормозов, привода распредвалов и датчики лучше брать оригинальные или проверенные: на маркетплейсах много подделок |
-
-Подробности о выборе деталей и проверенных аналогах — в разделе [[Запчасти и аналоги/index|Запчасти и аналоги]].
-
-## Аксессуары и тюнинг
-
-| Магазин | Что там искать |
-|---|---|
-| [killercustom.com](https://killercustom.com) | Рули и сиденья для Sportster S (США, есть доставка в Россию) |
-| [palan-choppers.com](https://palan-choppers.com) | Тюнинг: выхлоп, указатели поворота и другое |
-| [mr-moto.ru](https://mr-moto.ru) | Кофры и багажные системы |
-| [decalmoto.com](https://www.decalmoto.com) | Наклейки и защитные плёнки для Pan America |
+Как выбрать деталь и какие аналоги проверены владельцами — в разделе [[Запчасти и аналоги/index|Запчасти и аналоги]].
 
 ## Мастерские и сервисы
 
