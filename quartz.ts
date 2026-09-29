@@ -79,5 +79,42 @@ componentRegistry.setOptionOverrides("@quartz-community/og-image", {
 })
 
 const config = await loadQuartzConfig()
+
+// Текст страницы для поиска. Плагин description собирает его через hast-util-to-string,
+// который склеивает соседние ячейки таблиц, пункты списков и абзацы без пробела
+// («…performanceC051CF8Многоосевой…»), и поиск не находит коды ошибок, номера деталей
+// и другие слова из таблиц. Этот обработчик идёт последним и пересобирает file.data.text
+// с пробелом после каждого блочного элемента; экранирование и сокращение ссылок — как у description.
+const blockTags = new Set([
+  "p", "li", "td", "th", "tr", "thead", "tbody", "table", "ul", "ol", "dt", "dd",
+  "h1", "h2", "h3", "h4", "h5", "h6", "div", "blockquote", "pre", "figcaption",
+  "section", "details", "summary", "br", "hr",
+])
+type HastLike = { type: string; value?: string; tagName?: string; children?: HastLike[] }
+const textWithGaps = (node: HastLike): string => {
+  if (node.type === "text") return node.value ?? ""
+  if (!node.children) return ""
+  let out = ""
+  for (const child of node.children) {
+    out += textWithGaps(child)
+    if (child.type === "element" && blockTags.has(child.tagName ?? "")) out += " "
+  }
+  return out
+}
+const escapeHTML = (s: string) =>
+  s.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;")
+const urlRegex =
+  /(https?:\/\/)?(?<domain>([\da-z.-]+)\.([a-z.]{2,6})(:\d+)?)(?<path>[/\w.-]*)(\?[/\w.=&;-]*)?/g
+config.plugins.transformers.push({
+  name: "SearchTextWithGaps",
+  htmlPlugins: () => [
+    () => (tree: HastLike, file: { data: Record<string, unknown> }) => {
+      file.data.text = escapeHTML(textWithGaps(tree))
+        .replace(urlRegex, "$<domain>$<path>")
+        .replace(/[ \t]+/g, " ")
+    },
+  ],
+})
+
 export default config
 export const layout = await loadQuartzLayout()
