@@ -1,0 +1,599 @@
+@use "./variables.scss" as *;
+
+// Фирменный акцент по логотипу Harley-Davidson: оранжевый #FF6600.
+// Тема @quartz-themes/core подменяет цвета из quartz.config.yaml своими (селектор :root:root),
+// поэтому акцент задаётся здесь с более высоким приоритетом; нейтральные цвета фона и текста
+// остаются от темы. Значения держать в согласии с разделом colors в quartz.config.yaml.
+// В светлой теме ссылки темнее оранжевого логотипа — ради читаемости на светлом фоне.
+:root:root:root {
+  --accent-h: 24;
+  --accent-s: 100%;
+  --accent-l: 36%;
+  --secondary: #b84a00;
+  --tertiary: #ff6600;
+  --text-accent: var(--secondary);
+  --text-accent-hover: var(--tertiary);
+  --link-color: var(--secondary);
+  --link-color-hover: var(--tertiary);
+  --highlight: rgba(255, 102, 0, 0.08);
+  --textHighlight: #ff660033;
+
+  // Айдентика: оранжевый логотипа + чёрный, тёплые серые и «металлы» мотоцикла.
+  // Смысловые цвета выносок подобраны тёплыми, чтобы не спорить с оранжевым.
+  --rm-accent: #b84a00; // оранжевый: главное, «Кратко»
+  --rm-neutral: #6b645e; // тёплый серый: заметки
+  --rm-tip: #8a6a35; // бронза крышек двигателя: советы
+  --rm-warning: #a87400; // янтарный: предупреждения
+  --rm-danger: #b3261e; // сигнальный красный: опасность
+  --rm-caption: #7a726b; // подписи рисунков
+  --rm-surface: #f1ede9; // подложка карточек и шапок таблиц
+}
+
+:root:root:root[saved-theme="dark"] {
+  --accent-l: 50%;
+  --secondary: #ff6600;
+  --tertiary: #ff8533;
+  --highlight: rgba(255, 102, 0, 0.1);
+  --textHighlight: #ff660044;
+
+  --rm-accent: #ff6600;
+  --rm-neutral: #a39b94;
+  --rm-tip: #c9a36a;
+  --rm-warning: #e8b530;
+  --rm-danger: #f0533d;
+  --rm-caption: #9a938c;
+  --rm-surface: #2a2724;
+}
+
+// Правая боковая панель (граф, оглавление, обратные ссылки) отключена:
+// на широком экране страница делится на две колонки — меню и статья.
+// Меню шире стандартного (380 px вместо 320 на компьютере, 340 px на планшете)
+// и с меньшими боковыми отступами — длинные названия статей реже переносятся.
+$menuWidth: 380px;
+$menuWidthTablet: 340px;
+
+.page[data-frame="default"] > #quartz-body,
+.page:not([data-frame]) > #quartz-body {
+  @media all and ($desktop) {
+    grid-template-columns: #{$menuWidth} auto;
+    grid-template-areas:
+      "grid-sidebar-left grid-header"
+      "grid-sidebar-left grid-center"
+      "grid-sidebar-left grid-footer";
+  }
+
+  @media all and ($tablet) {
+    grid-template-columns: #{$menuWidthTablet} auto;
+  }
+
+  & .sidebar.left {
+    @media all and not ($mobile) {
+      padding-left: 1.25rem;
+      padding-right: 1.25rem;
+      padding-top: 2rem;
+    }
+  }
+
+  & .sidebar.right {
+    display: none;
+  }
+}
+
+// Пункты меню чуть мельче основного текста.
+.explorer .explorer-content {
+  font-size: 0.9rem;
+
+  & ul li > a,
+  & .folder-button {
+    font-size: inherit;
+    line-height: 1.35;
+  }
+}
+
+// Внутренние ссылки без маркерного фона — как обычные ссылки, окрашен только текст.
+a.internal {
+  background-color: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// Логотип слева от названия сайта, название в две строки справа («База знаний / Revolution Max»).
+// Вместе кликабельны и ведут на главную. Сетка: колонка логотипа и узкая колонка текста,
+// в которой название переносится на вторую строку.
+.page-title {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.2;
+
+  & a {
+    display: grid;
+    grid-template-columns: auto 8.2em;
+    justify-content: start;
+    align-items: center;
+    column-gap: 0.75rem;
+    color: var(--dark);
+    text-decoration: none;
+
+    &::before {
+      content: "";
+      display: block;
+      width: 60px;
+      height: 47px;
+      background: url("static/logo.svg") no-repeat left center / contain;
+    }
+
+    &:hover {
+      color: var(--rm-accent);
+      text-decoration: none;
+    }
+  }
+
+  // Тема задаёт ссылке в заголовке свой крупный размер — возвращаем размер заголовка.
+  html body .sidebar & a {
+    font-size: inherit;
+  }
+
+  @media all and ($mobile) {
+    font-size: 0.95rem;
+
+    & a::before {
+      width: 44px;
+      height: 34px;
+    }
+  }
+}
+
+// Плитки разделов на главной: callout [!tiles] со списком ссылок.
+// Плитка кликабельна целиком за счёт растянутой ссылки.
+// Иконки — Tabler Icons (MIT), https://tabler.io/icons — вставлены как встроенный SVG
+// прямо в content/index.md (svg.tile-icon перед ссылкой), поэтому не зависят от CSS-масок.
+
+blockquote.callout[data-callout="tiles"] {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 1rem 0 1.5rem;
+
+  & > .callout-title {
+    display: none;
+  }
+
+  & > .callout-content {
+    padding: 0;
+  }
+
+  & > .callout-content > ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+  }
+
+  & li {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--lightgray);
+    border-top: 3px solid var(--secondary);
+    border-radius: 10px;
+    background: var(--light);
+    transition:
+      border-color 0.15s ease,
+      transform 0.15s ease,
+      box-shadow 0.15s ease;
+
+    &::marker {
+      content: none;
+    }
+
+    &:hover {
+      border-color: var(--secondary);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    }
+
+    & > svg.tile-icon {
+      flex: none;
+      width: 28px;
+      height: 28px;
+      color: var(--secondary);
+    }
+
+    & > a.internal {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--dark);
+
+      &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+      }
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+
+  }
+}
+
+// Автоматический список файлов («В этой папке N элементов») скрыт на страницах папок,
+// у которых есть собственный index.md с текстом. Папки без index.md и страницы тегов
+// сохраняют список, иначе они были бы пустыми.
+body[data-slug$="/index"] .popover-hint:has(> article .markdown-preview-view > *) > .page-listing {
+  display: none;
+}
+
+// Без горизонтальной черты, которую Quartz ставит после текста статьи.
+// Черты внутри самих заметок (---) не затрагиваются.
+.center > hr {
+  display: none;
+}
+
+// Путь к странице (хлебные крошки) — внизу статьи, над подвалом, мелким шрифтом.
+.center .breadcrumb-container {
+  margin-top: 2.5rem;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  color: var(--gray);
+
+  & p {
+    margin: 0;
+  }
+}
+
+// Без заголовка «Проводник» над меню: на компьютере меню всегда развёрнуто.
+// Кнопка открытия меню на телефоне (mobile-explorer) остаётся.
+.sidebar .explorer button.desktop-explorer {
+  display: none;
+}
+
+// Встроенный просмотр PDF (![[файл.pdf]]) — во всю ширину статьи и почти на высоту экрана.
+iframe.pdf {
+  width: 100%;
+  height: 85vh;
+  border: 1px solid var(--lightgray);
+  border-radius: 6px;
+}
+
+// Встроенное видео (![[файл.mp4]]) целиком помещается в экран: вертикальное видео не растягивается на всю ширину статьи.
+article video {
+  display: block;
+  max-width: 100%;
+  max-height: 70vh;
+  width: auto;
+  border-radius: 6px;
+}
+
+// Подвал без строки «Создано с помощью Quartz».
+footer > p {
+  display: none;
+}
+
+// ─── Выноски (callout) в фирменных цветах ───────────────────────────────────
+// Единый вид: лёгкая подложка цвета выноски, полоса слева, скруглённый правый край.
+// Тема @quartz-themes/core задаёт выноскам свои цвета с селектором html[saved-theme] body .callout,
+// поэтому здесь селектор длиннее (article + blockquote).
+html[saved-theme] body article blockquote.callout:not([data-callout="tiles"]) {
+  --rm-c: var(--rm-neutral);
+  --color: var(--rm-c);
+  --border: transparent;
+  --bg: transparent;
+  --callout-color: var(--rm-c);
+  --callout-title-color: var(--rm-c);
+  background: color-mix(in srgb, var(--rm-c) 8%, transparent) !important;
+  border: none !important;
+  border-left: 3px solid var(--rm-c) !important;
+  border-radius: 0 8px 8px 0 !important;
+  padding: 0.85rem 1.1rem !important;
+  margin: 1.25rem 0;
+
+  & > .callout-title {
+    color: var(--rm-c) !important;
+    padding: 0 0 0.35rem 0 !important;
+    align-items: center;
+
+    & > .callout-title-inner > p {
+      color: var(--rm-c) !important;
+      font-weight: 600;
+    }
+  }
+
+  & .callout-icon {
+    background-color: var(--rm-c) !important;
+  }
+
+  & > .callout-content > :last-child {
+    margin-bottom: 0;
+  }
+
+  &[data-callout="info"],
+  &[data-callout="abstract"],
+  &[data-callout="summary"],
+  &[data-callout="important"] {
+    --rm-c: var(--rm-accent);
+  }
+
+  &[data-callout="note"],
+  &[data-callout="todo"],
+  &[data-callout="quote"],
+  &[data-callout="example"] {
+    --rm-c: var(--rm-neutral);
+  }
+
+  &[data-callout="tip"],
+  &[data-callout="hint"],
+  &[data-callout="success"] {
+    --rm-c: var(--rm-tip);
+  }
+
+  &[data-callout="warning"],
+  &[data-callout="caution"],
+  &[data-callout="attention"],
+  &[data-callout="question"] {
+    --rm-c: var(--rm-warning);
+  }
+
+  &[data-callout="danger"],
+  &[data-callout="error"],
+  &[data-callout="failure"],
+  &[data-callout="bug"] {
+    --rm-c: var(--rm-danger);
+  }
+}
+
+// ─── Таблицы ────────────────────────────────────────────────────────────────
+// Шапка на тёплой подложке с оранжевой чертой снизу, тонкие тёплые линии строк.
+html[saved-theme] body article table {
+  border-collapse: collapse;
+
+  & th {
+    background: var(--rm-surface) !important;
+    border-bottom: 2px solid var(--rm-accent) !important;
+    font-weight: 600;
+  }
+
+  & td {
+    border-bottom: 1px solid var(--lightgray) !important;
+  }
+
+  & tr:hover > td {
+    background: color-mix(in srgb, var(--rm-accent) 4%, transparent);
+  }
+}
+
+// Тёмная тема: таблица в рамке, тело чуть светлее фона страницы (#1c1c1c), «зебра» строк.
+html[saved-theme="dark"] body article table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid #3a3531;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #222020;
+
+  & th {
+    background: #2e2a27 !important;
+  }
+
+  & td {
+    border-bottom-color: #34302c !important;
+  }
+
+  & tbody tr:nth-child(even) > td {
+    background: #292624;
+  }
+
+  & tbody tr:last-child > td {
+    border-bottom: none !important;
+  }
+
+  & tr:hover > td {
+    background: #35281f !important;
+  }
+}
+
+// Светлая тема: фон страницы почти белый, поэтому таблица получает рамку, белое тело,
+// «зебру» строк и более плотную шапку — иначе она сливается с фоном.
+html[saved-theme="light"] body article table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid #ddd6cf;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #ffffff;
+
+  & th {
+    background: #ece5de !important;
+  }
+
+  & tbody tr:nth-child(even) > td {
+    background: #f7f3ef;
+  }
+
+  & tbody tr:last-child > td {
+    border-bottom: none !important;
+  }
+
+  & tr:hover > td {
+    background: #fbeee3 !important;
+  }
+}
+
+// ─── Подписи рисунков и видео ───────────────────────────────────────────────
+// Рисунок и строка «Рисунок N — …» стоят в одном абзаце: абзац с картинкой — мелкий серый текст.
+article p:has(> img),
+article p:has(> video) {
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--rm-caption);
+
+  & > img {
+    display: block;
+    margin-bottom: 0.4rem;
+    border-radius: 6px;
+  }
+}
+
+// ─── Меню ───────────────────────────────────────────────────────────────────
+// Стрелки у разделов меню — фирменным оранжевым.
+html[saved-theme] body .explorer svg.folder-icon {
+  color: var(--rm-accent) !important;
+  stroke: var(--rm-accent) !important;
+  opacity: 1;
+}
+
+// ─── Три мотоцикла на главной ───────────────────────────────────────────────
+// Только на компьютере: фото на карточках с мягкой подсветкой (фото с прозрачным фоном,
+// в тёмной теме чёрный мотоцикл иначе сливается с фоном). Карточка ведёт на статью о модели.
+.model-row {
+  display: none;
+
+  @media all and ($desktop) {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin: 1.5rem 0 1.75rem;
+  }
+
+  & a.model-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.75rem 0.75rem 0.9rem;
+    border: 1px solid var(--lightgray);
+    border-radius: 10px;
+    background: radial-gradient(ellipse at 50% 55%, var(--rm-surface) 0%, transparent 75%);
+    color: var(--dark);
+    font-weight: 600;
+    text-decoration: none;
+    transition:
+      border-color 0.15s ease,
+      transform 0.15s ease;
+
+    &:hover {
+      border-color: var(--rm-accent);
+      transform: translateY(-2px);
+      text-decoration: none;
+    }
+
+    & img {
+      width: 100%;
+      height: auto;
+      margin: 0 0 0.35rem;
+    }
+  }
+}
+
+:root[saved-theme="dark"] .model-row a.model-card {
+  background: radial-gradient(ellipse at 50% 55%, #3a3632 0%, #1c1a19 70%);
+}
+
+// Печать: только статья — без меню, поиска, подвала и пути; чёрный текст на белом, таблицы не рвутся.
+@media print {
+  :root,
+  :root[saved-theme="dark"] {
+    --light: #ffffff !important;
+    --lightgray: #cccccc !important;
+    --gray: #666666 !important;
+    --darkgray: #111111 !important;
+    --dark: #000000 !important;
+    --secondary: #000000 !important;
+    --tertiary: #000000 !important;
+  }
+
+  body,
+  .page,
+  #quartz-body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .sidebar,
+  footer,
+  .breadcrumb-container,
+  .search,
+  .darkmode,
+  .readermode,
+  .explorer,
+  iframe.pdf,
+  article video {
+    display: none !important;
+  }
+
+  .page > #quartz-body {
+    display: block !important;
+  }
+
+  .center {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  a,
+  a.internal {
+    color: #000000 !important;
+    text-decoration: underline;
+  }
+
+  table,
+  tr,
+  blockquote.callout,
+  pre,
+  img {
+    break-inside: avoid;
+  }
+
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+
+  blockquote.callout[data-callout="tiles"] li {
+    border-color: #999999 !important;
+    box-shadow: none !important;
+  }
+}
+
+// Регламент ТО (Обслуживание/Регламент технического обслуживания): компактная таблица — перенос названий работ, отметки по центру.
+body[data-slug="обслуживание/регламент-технического-обслуживания"] article table {
+  font-size: 0.8rem;
+
+  th,
+  td {
+    white-space: normal;
+    padding: 0.25rem 0.4rem;
+    min-width: 0 !important;
+    width: auto;
+  }
+
+  td:first-child {
+    min-width: 11rem !important;
+  }
+
+  td:nth-child(2) {
+    min-width: 7rem !important;
+  }
+}
+
+body[data-slug="обслуживание/регламент-технического-обслуживания"] article table:has(td:nth-child(10)) {
+  th:nth-child(n + 3),
+  td:nth-child(n + 3) {
+    text-align: center;
+  }
+}
