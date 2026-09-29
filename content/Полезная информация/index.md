@@ -48,7 +48,6 @@ title: Полезная информация
 | Мастерская | Город | Специализация |
 |---|---|---|
 | TuneMyHarley — [tunemyharley.ru](https://tunemyharley.ru), Telegram @TuneMyHarley | — | Прошивка [[Electronic Control Module (ECM)\|блока управления двигателем]] |
-| «Телега» — [telega-sochi.ru](http://telega-sochi.ru) | Сочи | Мастерская, рекомендованная участниками группы |
 
 > [!tip] Нет вашего города?
 > Если вы знаете хорошую мастерскую, которая работает с Revolution Max, напишите в Telegram-группу — добавим в список.

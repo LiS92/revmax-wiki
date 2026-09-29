@@ -13,6 +13,7 @@ configuration:
     - .obsidian
     - "**/Service-Manual-Sportster-S-RH1250S-2021-94000907.pdf"
     - "**/Parts-Catalog-Sportster-S-RH1250S-2021.pdf"
+    - "**/Pasted image*"
   theme:
     fontOrigin: googleFonts
     cdnCaching: true
