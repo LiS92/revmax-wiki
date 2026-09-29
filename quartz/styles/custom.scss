@@ -101,50 +101,44 @@ a.internal {
   }
 }
 
-// Логотип слева от названия сайта, название в две строки справа («База знаний / Revolution Max»).
-// Вместе кликабельны и ведут на главную. Сетка: колонка логотипа и узкая колонка текста,
-// в которой название переносится на вторую строку.
+// Логотип RevMax в шапке меню (эмблема с двигателем Revolution Max и надписью REVMAX), ведёт на главную.
+// Для светлой и тёмной темы — свои PNG (quartz/static/revmax-logo-light.png и -dark.png, 720×252,
+// исходники — папка «Логотип»). Текст названия сайта остаётся в разметке для экранных читалок
+// и поисковиков, но скрыт: font-size 0.
 .page-title {
   margin: 0;
-  font-size: 1.05rem;
-  line-height: 1.2;
+  font-size: 0;
+  line-height: 0;
 
   & a {
-    display: grid;
-    grid-template-columns: auto 8.2em;
-    justify-content: start;
-    align-items: center;
-    column-gap: 0.75rem;
-    color: var(--dark);
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    aspect-ratio: 720 / 252;
+    background: url("static/revmax-logo-light.png") no-repeat left center / contain;
+    color: transparent;
     text-decoration: none;
 
-    &::before {
-      content: "";
-      display: block;
-      width: 60px;
-      height: 47px;
-      background: url("static/logo.svg") no-repeat left center / contain;
-    }
-
     &:hover {
-      color: var(--rm-accent);
       text-decoration: none;
+      opacity: 0.85;
     }
   }
 
-  // Тема задаёт ссылке в заголовке свой крупный размер — возвращаем размер заголовка.
+  // Тема задаёт ссылке в заголовке свой крупный размер — обнуляем.
   html body .sidebar & a {
-    font-size: inherit;
+    font-size: 0;
   }
 
   @media all and ($mobile) {
-    font-size: 0.95rem;
-
-    & a::before {
-      width: 44px;
-      height: 34px;
+    & a {
+      max-width: 220px;
     }
   }
+}
+
+:root[saved-theme="dark"] .page-title a {
+  background-image: url("static/revmax-logo-dark.png");
 }
 
 // Плитки разделов на главной: callout [!tiles] со списком ссылок.
