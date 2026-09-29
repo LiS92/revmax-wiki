@@ -501,6 +501,69 @@ html[saved-theme] body .explorer svg.folder-icon {
   background: radial-gradient(ellipse at 50% 55%, #3a3632 0%, #1c1a19 70%);
 }
 
+// ─── Поиск Pagefind (окно поверх страницы) ─────────────────────────────────
+// Цвета и шрифт окна — из палитры сайта. Pagefind задаёт переменные на :root,
+// здесь селектор сильнее; тема окна переключается атрибутом data-pf-theme на <html> (ставит скрипт в quartz.ts).
+:root:root:root {
+  --pf-font: "Inter", sans-serif;
+  --pf-text: #1a1a1a;
+  --pf-text-secondary: #3d3935;
+  --pf-text-muted: #7a726b;
+  --pf-background: #faf8f6;
+  --pf-border: #ddd6cf;
+  --pf-border-focus: var(--rm-accent);
+  --pf-hover: #f3ece5;
+  --pf-mark: var(--rm-accent);
+  --pf-skeleton: #ece5de;
+  --pf-skeleton-shine: #f5f1ed;
+  --pf-outline-focus: var(--rm-accent);
+  --pf-modal-backdrop: rgba(20, 18, 17, 0.55);
+  --pf-border-radius: 10px;
+  --pf-modal-max-width: 720px;
+  --pf-modal-top: 8dvh;
+  --pf-input-height: 44px;
+  --pf-input-font-size: 17px;
+  --pf-summary-font-size: 13px;
+  --pf-result-title-font-size: 16px;
+  --pf-result-excerpt-font-size: 14px;
+  --pf-results-gap: 6px;
+}
+
+:root:root:root[saved-theme="dark"] {
+  --pf-text: #f2efec;
+  --pf-text-secondary: #d6d2ce;
+  --pf-text-muted: #9a938c;
+  --pf-background: #1c1a19;
+  --pf-border: #3a3531;
+  --pf-hover: #2a2522;
+  --pf-skeleton: #2a2724;
+  --pf-skeleton-shine: #332f2b;
+  --pf-scroll-shadow: rgba(0, 0, 0, 0.4);
+  --pf-shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.6);
+  --pf-modal-backdrop: rgba(0, 0, 0, 0.65);
+}
+
+// Выдержки — до трёх строк, чтобы найденное слово попадало в видимую часть.
+pagefind-modal .pf-result-excerpt,
+pagefind-modal .pf-heading-excerpt {
+  white-space: normal !important;
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical !important;
+  -webkit-line-clamp: 3 !important;
+  line-clamp: 3 !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+}
+
+// Найденные слова в фрагментах — оранжевым на лёгкой подложке.
+pagefind-modal mark {
+  background: color-mix(in srgb, var(--rm-accent) 16%, transparent) !important;
+  color: inherit !important;
+  font-weight: 600;
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
 // Печать: только статья — без меню, поиска, подвала и пути; чёрный текст на белом, таблицы не рвутся.
 @media print {
   :root,

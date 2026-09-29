@@ -38,6 +38,9 @@ jobs:
         run: npm ci
       - name: Build Quartz
         run: npx quartz build
+      # Поисковый индекс Pagefind по готовому сайту (настройки — pagefind.yml).
+      - name: Build search index (Pagefind)
+        run: npx pagefind
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

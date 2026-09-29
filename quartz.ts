@@ -116,5 +116,86 @@ config.plugins.transformers.push({
   ],
 })
 
+// Поиск Pagefind вместо встроенного поиска Quartz. Индекс строит `npx pagefind` по готовому сайту
+// (настройки — pagefind.yml), файлы лежат в /pagefind/. Кнопка «Поиск» в меню остаётся от плагина
+// search: скрипт перехватывает нажатие на неё и Ctrl+K раньше штатного поиска и открывает окно
+// <pagefind-modal>. Quartz при переходах подменяет <body>, поэтому окно создаётся заново, если его нет.
+const pagefindGlue = `(() => {
+  if (window.__rmPagefind) return
+  window.__rmPagefind = true
+  const clean = (href) => href.replace(/\\.html(?=$|[?#])/, "").replace(/\\/index(?=$|[?#])/, "/")
+  const modal = () => {
+    let m = document.getElementById("rm-pagefind-modal")
+    if (!m) {
+      m = document.createElement("pagefind-modal")
+      m.id = "rm-pagefind-modal"
+      document.body.appendChild(m)
+    }
+    return m
+  }
+  const open = () => {
+    const dark = document.documentElement.getAttribute("saved-theme") === "dark"
+    document.documentElement.setAttribute("data-pf-theme", dark ? "dark" : "light")
+    const m = modal()
+    customElements.whenDefined("pagefind-modal").then(() =>
+      setTimeout(() => {
+        // Без подрезультатов (совпадений по разделам внутри найденной заметки): в выдаче только заметки.
+        const results = m.querySelector("pagefind-results")
+        // Значение именно "true": при смене атрибута компонент считает пустую строку за «нет».
+        if (results && results.getAttribute("hide-sub-results") !== "true") results.setAttribute("hide-sub-results", "true")
+        if (m.open) m.open()
+      }, 0),
+    )
+  }
+  document.addEventListener("click", (e) => {
+    const t = e.target
+    if (!(t instanceof Element)) return
+    if (t.closest(".search-button")) {
+      e.preventDefault()
+      e.stopImmediatePropagation()
+      open()
+      return
+    }
+    const a = t.closest("pagefind-modal a[href]")
+    if (a) {
+      a.setAttribute("href", clean(a.getAttribute("href")))
+      const m = document.getElementById("rm-pagefind-modal")
+      setTimeout(() => m && m.close && m.close(), 0)
+    }
+  }, true)
+  window.addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.code === "KeyK") {
+      e.preventDefault()
+      e.stopImmediatePropagation()
+      open()
+    }
+  }, true)
+})()`
+// Пробел между ячейками таблиц прямо в HTML: Quartz выводит <td> вплотную, и Pagefind склеивает
+// соседние ячейки в выдержках («НомерДетальОригинальное название»). На вид таблиц пробел не влияет.
+const spaceTableCells = (node: HastLike) => {
+  if (!node.children) return
+  // Пробел — последним внутри ячейки: пробелы между ячейками Quartz при выводе HTML отбрасывает.
+  if (node.type === "element" && (node.tagName === "td" || node.tagName === "th")) {
+    node.children.push({ type: "text", value: " " })
+    return
+  }
+  for (const c of node.children) spaceTableCells(c)
+}
+config.plugins.transformers.push({
+  name: "SpaceTableCells",
+  htmlPlugins: () => [() => (tree: HastLike) => spaceTableCells(tree)],
+})
+config.plugins.transformers.push({
+  name: "PagefindSearch",
+  externalResources: () => ({
+    css: [{ content: "/pagefind/pagefind-component-ui.css" }],
+    js: [
+      { src: "/pagefind/pagefind-component-ui.js", loadTime: "afterDOMReady", contentType: "external" },
+      { script: pagefindGlue, loadTime: "afterDOMReady", contentType: "inline" },
+    ],
+  }),
+})
+
 export default config
 export const layout = await loadQuartzLayout()
